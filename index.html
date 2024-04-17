@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nomination Whist</title>
+    <script src="Card.js"></script>
+    <script src="Player.js"></script>
+    <script src="Round.js"></script>
+    <script src="Game.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <h1>Nomination Whist</h1>
+    <div id="userInterfaceDiv">
+
+    </div>
+
+    <!-- Bootstrap Modal -->
+    <div class="modal fade" id="playerNamesModal" tabindex="-1" role="dialog" aria-labelledby="playerNamesModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="playerNamesModalLabel">Enter Player Names</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="playerNamesForm">
+                        <div id="playerNameInputs" class="form-group">
+                            <!-- Player name inputs will be added here -->
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal HTML for player's hand -->
+    <div id="handModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Your Hand</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="handModalBody">
+                    <!-- Player's hand will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        const UIDIV = document.getElementById("userInterfaceDiv");
+        const playerNamesForm = document.getElementById("playerNamesForm");
+        let players = []; // Array to store Player objects
+
+
+        // Function to handle the form submission
+        function handleSubmit(event) {
+            event.preventDefault(); // Prevent form submission
+            const numPlayers = parseInt(document.getElementById('numPlayersInput').value);
+            if (!isNaN(numPlayers)) {
+                openPlayerNameModal(numPlayers);
+            } else {
+                alert('Please enter a valid number of players.');
+            }
+        }
+
+        // Function to open the player name modal dialog
+        function openPlayerNameModal(numPlayers) {
+            // Clear previous inputs
+            const playerNameInputs = document.getElementById('playerNameInputs');
+            playerNameInputs.innerHTML = '';
+
+            // Create input fields for player names
+            for (let i = 0; i < numPlayers; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = `Player ${i + 1} Name`;
+                input.className = 'form-control mb-2';
+                playerNameInputs.appendChild(input);
+            }
+
+            // Display the modal
+            $('#playerNamesModal').modal('show');
+        }
+
+        // Event listener for the form submission inside the modal
+        playerNamesForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent form submission
+            const inputs = document.querySelectorAll('#playerNameInputs input');
+            const playerNames = Array.from(inputs).map(input => input.value.trim() || input.placeholder.trim());
+            console.log('Player names:', playerNames);
+
+            // Create Player objects and push them to the players array
+            players = playerNames.map(name => new Player(name));
+            console.log('Players:', players);
+
+            // Create a Game object with the players array
+            const numCardsPerPlayer = 5; // Example value, adjust as needed
+            const trumpSuit = 'Hearts'; // Example value, adjust as needed
+            const numberOfRounds = 3; // Example value, adjust as needed
+            const game = new Game(players, numCardsPerPlayer, trumpSuit, numberOfRounds);
+            console.log('Game:', game);
+
+            // Optionally, start the game here or perform any other actions
+            game.start();
+
+            // Close the modal
+            $('#playerNamesModal').modal('hide');
+        });
+        // Create the form elements
+        const form = document.createElement('form');
+        const label = document.createElement('label');
+        label.textContent = 'How many players? ';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = 'numPlayersInput';
+        input.min = '1';
+        input.required = true;
+        const submitButton = document.createElement('button');
+        submitButton.textContent = 'Submit';
+        submitButton.type = 'submit';
+
+        // Add event listener to the form
+        form.addEventListener('submit', handleSubmit);
+
+        // Append elements to the form and UI
+        form.appendChild(label);
+        form.appendChild(input);
+        form.appendChild(submitButton);
+        UIDIV.appendChild(form);
+    </script>
+</body>
+
+</html>
