@@ -15,45 +15,71 @@
 </head>
 
 <body>
-    <h1>Nomination Whist</h1>
-    <div id="userInterfaceDiv">
+    <div class="container">
+        <h1>Nomination Whist</h1>
+        <div id="userInterfaceDiv">
 
-    </div>
+        </div>
 
-    <!-- Bootstrap Modal -->
-    <div class="modal fade" id="playerNamesModal" tabindex="-1" role="dialog" aria-labelledby="playerNamesModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="playerNamesModalLabel">Enter Player Names</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="playerNamesForm">
-                        <div id="playerNameInputs" class="form-group">
-                            <!-- Player name inputs will be added here -->
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
+        <!-- Player Names Modal -->
+        <div class="modal fade" id="playerNamesModal" tabindex="-1" role="dialog"
+            aria-labelledby="playerNamesModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="playerNamesModalLabel">Enter Player Names</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="playerNamesForm">
+                            <div id="playerNameInputs" class="form-group">
+                                <!-- Player name inputs will be added here -->
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Names</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+        <!-- Bootstrap Modal for bidding -->
+<div class="modal fade" id="bidModal" tabindex="-1" role="dialog" aria-labelledby="bidModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bidModalLabel">Enter Your Bid</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="bidForm">
+                    <div class="form-group">
+                        <label for="bidInput">Bid:</label>
+                        <input type="number" class="form-control" id="bidInput" min="0">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Bid</button>
+                </form>
+            </div>
+        </div>
     </div>
-    <!-- Modal HTML for player's hand -->
-    <div id="handModal" class="modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Your Hand</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body" id="handModalBody">
-                    <!-- Player's hand will be displayed here -->
+</div>
+
+        <!-- Modal HTML for player's hand -->
+        <div id="handModal" class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Your Hand</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="handModalBody">
+                        <p>Trump Suit: <span id="trumpSuit"></span></p>
+                        <!-- Player's hand will be displayed here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -73,6 +99,7 @@
 
         // Function to handle the form submission
         function handleSubmit(event) {
+            console.log("line 78 handle submit")
             event.preventDefault(); // Prevent form submission
             const numPlayers = parseInt(document.getElementById('numPlayersInput').value);
             if (!isNaN(numPlayers)) {
@@ -101,51 +128,77 @@
             $('#playerNamesModal').modal('show');
         }
 
-        // Event listener for the form submission inside the modal
-        playerNamesForm.addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent form submission
-            const inputs = document.querySelectorAll('#playerNameInputs input');
-            const playerNames = Array.from(inputs).map(input => input.value.trim() || input.placeholder.trim());
-            console.log('Player names:', playerNames);
+      // Event listener for when the modal is fully shown
+$('#playerNamesModal').on('shown.bs.modal', function () {
+    // Event listener for the form submission inside the modal
+    $('#playerNamesForm').submit(function (event) {
+        event.preventDefault(); // Prevent form submission
+        const inputs = $('#playerNameInputs input');
+        const playerNames = inputs.map(function() {
+            return $(this).val().trim() || $(this).attr('placeholder').trim();
+        }).get();
+        console.log('Player names:', playerNames);
 
-            // Create Player objects and push them to the players array
-            players = playerNames.map(name => new Player(name));
-            console.log('Players:', players);
+        // Create Player objects and push them to the players array
+        players = playerNames.map(name => new Player(name));
+        console.log('Players:', players);
 
-            // Create a Game object with the players array
-            const numCardsPerPlayer = 5; // Example value, adjust as needed
-            const trumpSuit = 'Hearts'; // Example value, adjust as needed
-            const numberOfRounds = 3; // Example value, adjust as needed
-            const game = new Game(players, numCardsPerPlayer, trumpSuit, numberOfRounds);
-            console.log('Game:', game);
+        // Create a Game object with the players array
+        const numCardsPerPlayer = 5; // Example value, adjust as needed
+        const trumpSuit = 'Hearts'; // Example value, adjust as needed
+        const numberOfRounds = 3; // Example value, adjust as needed
+        const game = new Game(players, numCardsPerPlayer, trumpSuit, numberOfRounds);
+        console.log('Game:', game);
+        // Close the modal
+        $('#playerNamesModal').modal('hide');
+        // Optionally, start the game here or perform any other actions
+        game.start();
 
-            // Optionally, start the game here or perform any other actions
-            game.start();
+        
+    });
+});
 
-            // Close the modal
-            $('#playerNamesModal').modal('hide');
-        });
-        // Create the form elements
-        const form = document.createElement('form');
+
+        // HOW MANY PLAYERS?
+        // Create the form group for the number of players input
+        const formGroup = document.createElement('div');
+        formGroup.classList.add('form-group');
+
+        // Create label for the number of players input
         const label = document.createElement('label');
-        label.textContent = 'How many players? ';
+        label.textContent = 'How many players?';
+        label.setAttribute('for', 'numPlayersInput');
+        formGroup.appendChild(label);
+
+        // Create the number of players input element
         const input = document.createElement('input');
         input.type = 'number';
         input.id = 'numPlayersInput';
-        input.min = '1';
-        input.required = true;
+        input.classList.add('form-control');
+        input.setAttribute('min', '1');
+        input.setAttribute('required', true);
+        formGroup.appendChild(input);
+
+        // Append form group to the UI
+        UIDIV.appendChild(formGroup);
+
+        // Create the submit button
         const submitButton = document.createElement('button');
         submitButton.textContent = 'Submit';
         submitButton.type = 'submit';
+        submitButton.classList.add('btn', 'btn-primary');
+        // Add event listener to the submit button
+submitButton.addEventListener('click', function(event) {
+    console.log("Submit button clicked");
+    handleSubmit(event);
+});
 
         // Add event listener to the form
-        form.addEventListener('submit', handleSubmit);
+        formGroup.addEventListener('submit', handleSubmit);
 
-        // Append elements to the form and UI
-        form.appendChild(label);
-        form.appendChild(input);
-        form.appendChild(submitButton);
-        UIDIV.appendChild(form);
+        // Append submit button to the form group
+        formGroup.appendChild(submitButton);
+
     </script>
 </body>
 

@@ -11,7 +11,7 @@ class Game {
     // Method to create a deck of cards
     createDeck() {
         const deck = [];
-        const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+        const suits = ['Hearts ❤️', 'Diamonds ♦️', 'Clubs ♣️', 'Spades ♠️'];
         const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'];
 
         suits.forEach(suit => {
@@ -25,23 +25,35 @@ class Game {
 
 
     // Method to start the game
-    start() {
-        // Deal cards to players
-        for (const player of this.players) {
-            const cards = this.deck.splice(0, this.numCardsPerPlayer);
-            player.addCardsToHand(cards);
-        }
+start() {
+    // Shuffle the deck
+    this.shuffleDeck();
 
-        // Play rounds
-        for (let i = 0; i < this.numberOfRounds; i++) {
-            const dealer = this.players[i % this.players.length]; // Cycle through players to determine dealer for each round
-            const round = new Round(this.numCardsPerPlayer, this.trumpSuit, dealer, this.players, 10); // Example value for numberOfTricks
-            this.rounds.push(round);
-            round.getBids(); // Start the bidding process for the round
-        }
-
-        // End of game logic
+    // Deal cards to players
+    for (const player of this.players) {
+        const cards = this.deck.splice(0, this.numCardsPerPlayer);
+        player.addCardsToHand(cards);
     }
+
+    // Play rounds
+    for (let i = 0; i < this.numberOfRounds; i++) {
+        const dealer = this.players[i % this.players.length]; // Cycle through players to determine dealer for each round
+        const round = new Round(this.numCardsPerPlayer, this.trumpSuit, dealer, this.players, 10); // Example value for numberOfTricks
+        this.rounds.push(round);
+        round.getBids(); // Start the bidding process for the round
+    }
+
+    // End of game logic
+}
+
+// Method to shuffle the deck
+shuffleDeck() {
+    for (let i = this.deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
+    }
+}
+
 
 // Method to handle the bidding process for a round
 getBidsForRound(roundNumber, trumpSuit) {

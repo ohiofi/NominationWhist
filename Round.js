@@ -5,10 +5,75 @@ class Round {
         this.dealer = dealer;
         this.players = players;
         this.leadingPlayerIndex = (players.indexOf(dealer) + 1) % players.length;
+        this.currentPlayerIndex = this.leadingPlayerIndex;
         this.bids = {};
         this.tricks = [];
         this.numberOfTricks = numberOfTricks;
     }
+
+    // Method to open the bid modal
+    openBidModal() {
+        const currentPlayer = this.players[this.currentPlayerIndex];
+        const modalLabel = $('#bidModalLabel');
+        modalLabel.text(currentPlayer.name + ', Enter Your Bid');
+    
+        // Check if the button already exists
+        let showCardsButton = $('#showCardsButton');
+        if (showCardsButton.length === 0) {
+            // Create a button to display the player's cards
+            showCardsButton = $('<button>').addClass('btn btn-primary').text('Show Me My Cards').attr('id', 'showCardsButton');
+            showCardsButton.on('click', () => this.showPlayerCards(currentPlayer));
+            const trumpSuitText = $('<p>').text('Trump Suit: ' + this.trumpSuit);
+            modalLabel.after(trumpSuitText, showCardsButton);
+        }
+    
+        $('#bidInput').val('');
+        $('#bidModal').modal('show'); // Show modal
+    }
+    
+
+   // Method to display the player's cards in a modal
+showPlayerCards(player) {
+    const handModalBody = $('#handModalBody');
+    handModalBody.empty(); // Clear previous content
+
+    // Display trump suit
+    handModalBody.append(`<p>Trump Suit: ${this.trumpSuit}</p>`);
+
+    // Display player's cards
+    const cards = player.hand.map(card => `${card.value} of ${card.suit}`);
+    const cardsList = $('<ul>').addClass('list-group');
+    cards.forEach(card => {
+        const listItem = $('<li>').addClass('list-group-item').text(card);
+        cardsList.append(listItem);
+    });
+
+    handModalBody.append(cardsList);
+    $('#handModal').modal('show'); // Show modal
+}
+
+
+    // // Function to handle bid submission
+    // handleBidSubmit(event) {
+    //     event.preventDefault(); // Prevent form submission
+
+    //     const bid = parseInt(document.getElementById('bidInput').value);
+
+    //     // Validate the bid
+    //     if (!isNaN(bid) && bid >= 0 && bid <= this.numberOfTricks - totalBidsPlaced) {
+    //         const currentPlayer = this.players[this.currentPlayerIndex];
+    //         this.bids[currentPlayer.name] = bid;
+    //         totalBidsPlaced += bid;
+    //         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+    //         $('#bidModal').modal('hide'); // Hide modal
+    //         if (totalBidsPlaced < this.numberOfTricks) {
+    //             openBidModal(); // Open modal for the next player
+    //         }
+    //     } else {
+    //         // Handle invalid bid
+    //         alert('Invalid bid. Please enter a number between 0 and ' + (this.numberOfTricks - totalBidsPlaced));
+    //     }
+    // }
 
 
     // Method to set bid for a player
@@ -30,33 +95,49 @@ class Round {
 getBids() {
     const bids = {};
     let totalBidsPlaced = 0;
-    let currentPlayerIndex = this.leadingPlayerIndex;
+    this.currentPlayerIndex = this.leadingPlayerIndex;
 
-    while (totalBidsPlaced < this.numberOfTricks) {
-        const currentPlayer = this.players[currentPlayerIndex];
+    const self = this; // Preserve reference to Round object
 
-        // Determine if the current player is the dealer and if so, ensure they don't bid to make total bids equal to number of tricks
-        if (currentPlayer === this.dealer && totalBidsPlaced === this.numberOfTricks - 1) {
-            break; // Dealer cannot bid to make total bids equal to number of tricks
-        }
-
-        // Prompt the player to place their bid
-        const bid = parseInt(prompt(`${currentPlayer.name}, enter your bid:`));
-
+    // Function to handle bid submission
+    function handleBidSubmit(event) {
+        event.preventDefault(); // Prevent form submission
+        const bid = parseInt(document.getElementById('bidInput').value);
         // Validate the bid
-        if (!isNaN(bid) && bid >= 0 && bid <= this.numberOfTricks - totalBidsPlaced) {
+        if (!isNaN(bid) && bid >= 0 && bid <= self.numberOfTricks - totalBidsPlaced) {
+            const currentPlayer = self.players[self.currentPlayerIndex]; // Define currentPlayer here
             // Record the bid
             bids[currentPlayer.name] = bid;
+            console.log(bids);
             totalBidsPlaced += bid;
-            currentPlayerIndex = (currentPlayerIndex + 1) % this.players.length;
+            self.currentPlayerIndex = (self.currentPlayerIndex + 1) % self.players.length;
+            $('#bidModal').modal('hide'); // Hide modal
+            if (totalBidsPlaced < self.numberOfTricks) {
+                self.openBidModal(); // Open modal for the next player
+            }
         } else {
             // Handle invalid bid
-            alert('Invalid bid. Please enter a number between 0 and ' + (this.numberOfTricks - totalBidsPlaced));
+            alert('Invalid bid. Please enter a number between 0 and ' + self.numberOfTricks);
         }
     }
 
+    // Open bidding modal for the first player
+    this.openBidModal();
+
+    // Event listener for bid submission
+    $('#bidForm').off('submit').on('submit', handleBidSubmit);
+
     return bids;
 }
+
+    
+    
+    
+
+
+
+
+    
 
 
     // Method to play a trick
