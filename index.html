@@ -44,27 +44,29 @@
             </div>
         </div>
         <!-- Bootstrap Modal for bidding -->
-<div class="modal fade" id="bidModal" tabindex="-1" role="dialog" aria-labelledby="bidModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="bidModalLabel">Enter Your Bid</h5>
+        <!-- Modal for entering player bids -->
+        <div class="modal fade" id="bidModal" tabindex="-1" role="dialog" aria-labelledby="bidModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="bidModalLabel">Enter Bids</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                  <span aria-hidden="true">&times;</span>
                 </button>
+              </div>
+              <div class="modal-body">
+                <div id="bidInputs"></div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitBids()">Submit Bids</button>
+              </div>
             </div>
-            <div class="modal-body">
-                <form id="bidForm">
-                    <div class="form-group">
-                        <label for="bidInput">Bid:</label>
-                        <input type="number" class="form-control" id="bidInput" min="0">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit Bid</button>
-                </form>
-            </div>
+          </div>
         </div>
-    </div>
-</div>
+
+
+
 
         <!-- Modal HTML for player's hand -->
         <div id="handModal" class="modal" tabindex="-1" role="dialog">
@@ -98,7 +100,7 @@
 
 
         // Function to handle the form submission
-        function handleSubmit(event) {
+        function handleSubmitNumPlayers(event) {
             console.log("line 78 handle submit")
             event.preventDefault(); // Prevent form submission
             const numPlayers = parseInt(document.getElementById('numPlayersInput').value);
@@ -154,7 +156,7 @@ $('#playerNamesModal').on('shown.bs.modal', function () {
         // Optionally, start the game here or perform any other actions
         game.start();
 
-        
+
     });
 });
 
@@ -190,11 +192,11 @@ $('#playerNamesModal').on('shown.bs.modal', function () {
         // Add event listener to the submit button
 submitButton.addEventListener('click', function(event) {
     console.log("Submit button clicked");
-    handleSubmit(event);
+    handleSubmitNumPlayers(event);
 });
 
         // Add event listener to the form
-        formGroup.addEventListener('submit', handleSubmit);
+        formGroup.addEventListener('submit', handleSubmitNumPlayers);
 
         // Append submit button to the form group
         formGroup.appendChild(submitButton);
